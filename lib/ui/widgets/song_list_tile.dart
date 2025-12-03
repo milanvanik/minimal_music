@@ -88,7 +88,6 @@ class SongListTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Row(
           children: [
-            // Show checkbox in selection mode, otherwise album art
             Stack(
               alignment: Alignment.center,
               children: [

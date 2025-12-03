@@ -89,7 +89,6 @@ class PlaylistDetailScreen extends StatelessWidget {
 
     final playlist = playlistProvider.getPlaylistById(playlistId);
 
-    // If playlist was deleted, pop back
     if (playlist == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pop(context);
@@ -140,8 +139,8 @@ class PlaylistDetailScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         playlistProvider.deletePlaylist(playlistId);
-                        Navigator.pop(context); // Close dialog
-                        Navigator.pop(context); // Close detail screen
+                        Navigator.pop(context);
+                        Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Playlist deleted'),
@@ -192,7 +191,6 @@ class PlaylistDetailScreen extends StatelessWidget {
                 )
               : Column(
                   children: [
-                    // Play All Button
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: ElevatedButton.icon(
@@ -211,7 +209,6 @@ class PlaylistDetailScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Songs List
                     Expanded(
                       child: ReorderableListView.builder(
                         padding: EdgeInsets.only(

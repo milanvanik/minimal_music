@@ -13,17 +13,14 @@ class SongProvider extends ChangeNotifier {
   bool _isInitializing = true;
   SortOption _sortOption = SortOption.dateAdded;
 
-  // Favorites
   Set<String> _favorites = {};
   bool _showFavoritesOnly = false;
 
-  // Filtering
   bool _filterShortSongs = true;
   Set<String> _excludedFolders = {};
-  Set<String> _manualFolders = {}; // User-added paths
-  List<Song> _allSongs = []; // Store all songs to derive folders
+  Set<String> _manualFolders = {};
+  List<Song> _allSongs = [];
 
-  // Selection mode for bulk operations
   bool _selectionMode = false;
   Set<String> _selectedSongs = {};
 
@@ -34,40 +31,34 @@ class SongProvider extends ChangeNotifier {
     return _songs;
   }
 
-  // Returns songs respecting folder/duration filters but IGNORING favorites filter
-  // Used for playlists to ensure they can show non-favorite songs even in Favorites mode
   List<Song> get allSongs => _songs;
 
   bool get isInitializing => _isInitializing;
   SortOption get sortOption => _sortOption;
   bool get showFavoritesOnly => _showFavoritesOnly;
+  bool get hasFavorites => _favorites.isNotEmpty;
   bool get filterShortSongs => _filterShortSongs;
   Set<String> get excludedFolders => _excludedFolders;
 
-  // Selection mode getters
   bool get selectionMode => _selectionMode;
   Set<String> get selectedSongs => _selectedSongs;
   int get selectedCount => _selectedSongs.length;
   bool isSongSelected(String path) => _selectedSongs.contains(path);
 
-  // Combined list for UI: Detected + Excluded + Manual
   Map<String, int> get managedFolders {
     final folders = <String, int>{};
 
-    // 1. Add detected folders
     for (var song in _allSongs) {
       final folder = song.path.substring(0, song.path.lastIndexOf('/'));
       folders[folder] = (folders[folder] ?? 0) + 1;
     }
 
-    // 2. Add excluded folders (if not already present)
     for (var folder in _excludedFolders) {
       if (!folders.containsKey(folder)) {
         folders[folder] = 0;
       }
     }
 
-    // 3. Add manual folders (if not already present)
     for (var folder in _manualFolders) {
       if (!folders.containsKey(folder)) {
         folders[folder] = 0;
@@ -85,10 +76,8 @@ class SongProvider extends ChangeNotifier {
   bool get hasPermission => _hasPermission;
 
   Future<void> _init() async {
-    // Request permission FIRST
     await _requestStoragePermission();
 
-    // Load songs (will only scan if permission granted)
     await loadSongs(fromUser: false);
 
     _isInitializing = false;
@@ -98,16 +87,11 @@ class SongProvider extends ChangeNotifier {
   Future<void> checkPermission() async {
     bool granted = false;
 
-    // Android 13+
     if (await Permission.audio.isGranted) {
       granted = true;
-    }
-    // Android 12 and below
-    else if (await Permission.storage.isGranted) {
+    } else if (await Permission.storage.isGranted) {
       granted = true;
-    }
-    // Manage External Storage
-    else if (await Permission.manageExternalStorage.isGranted) {
+    } else if (await Permission.manageExternalStorage.isGranted) {
       granted = true;
     }
 
@@ -116,24 +100,20 @@ class SongProvider extends ChangeNotifier {
   }
 
   Future<bool> _requestStoragePermission() async {
-    // Check if already granted
     await checkPermission();
     if (_hasPermission) return true;
 
-    // Request permissions
     Map<Permission, PermissionStatus> statuses = await [
       Permission.audio,
       Permission.storage,
     ].request();
 
-    // Check results
     if (statuses[Permission.audio]?.isGranted == true ||
         statuses[Permission.storage]?.isGranted == true) {
       _hasPermission = true;
       return true;
     }
 
-    // Check if Manage External Storage is ALREADY granted (don't request it automatically)
     if (await Permission.manageExternalStorage.isGranted) {
       _hasPermission = true;
       return true;
@@ -152,7 +132,7 @@ class SongProvider extends ChangeNotifier {
   void _applySort() {
     switch (_sortOption) {
       case SortOption.dateAdded:
-        _songs.sort((a, b) => b.modified.compareTo(a.modified)); // Newest first
+        _songs.sort((a, b) => b.modified.compareTo(a.modified));
         break;
       case SortOption.title:
         _songs.sort((a, b) => a.title.compareTo(b.title));
@@ -163,7 +143,6 @@ class SongProvider extends ChangeNotifier {
     }
   }
 
-  // Favorites Logic
   bool isFavorite(String path) => _favorites.contains(path);
 
   Future<void> toggleFavorite(String path) async {
@@ -188,7 +167,6 @@ class SongProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Filtering Logic
   Future<void> toggleFilterShortSongs() async {
     _filterShortSongs = !_filterShortSongs;
     notifyListeners();
@@ -226,7 +204,6 @@ class SongProvider extends ChangeNotifier {
   void _applyFilters() {
     var filtered = List<Song>.from(_allSongs);
 
-    // 1. Filter excluded folders
     if (_excludedFolders.isNotEmpty) {
       filtered = filtered.where((s) {
         final folder = s.path.substring(0, s.path.lastIndexOf('/'));
@@ -234,7 +211,6 @@ class SongProvider extends ChangeNotifier {
       }).toList();
     }
 
-    // 2. Filter short songs
     if (_filterShortSongs) {
       filtered = filtered.where((s) => s.duration.inSeconds >= 60).toList();
     }
@@ -253,18 +229,14 @@ class SongProvider extends ChangeNotifier {
   Future<void> loadSongs({bool fromUser = false}) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load favorites
     final favList = prefs.getStringList('favorite_songs') ?? [];
     _favorites = favList.toSet();
 
-    // Load filter preference
     _filterShortSongs = prefs.getBool('filter_short_songs') ?? true;
 
-    // Load excluded folders
     final excludedList = prefs.getStringList('excluded_folders') ?? [];
     _excludedFolders = excludedList.toSet();
 
-    // Load manual folders
     final manualList = prefs.getStringList('manual_folders') ?? [];
     _manualFolders = manualList.toSet();
 
@@ -282,10 +254,8 @@ class SongProvider extends ChangeNotifier {
       } catch (_) {}
     }
 
-    // Update permission status before deciding to scan
     await checkPermission();
 
-    // Only scan if we have permission OR if user explicitly requested (and we have permission)
     if (_hasPermission) {
       _isScanning = true;
       _scannedSongsCount = 0;
@@ -323,7 +293,6 @@ class SongProvider extends ChangeNotifier {
       _songs.removeWhere((s) => s.path == song.path);
       _allSongs.removeWhere((s) => s.path == song.path);
 
-      // Also remove from favorites if present
       if (_favorites.contains(song.path)) {
         toggleFavorite(song.path);
       }
@@ -334,7 +303,6 @@ class SongProvider extends ChangeNotifier {
     return false;
   }
 
-  // Selection mode methods
   void enterSelectionMode(String songPath) {
     _selectionMode = true;
     _selectedSongs.clear();
@@ -351,7 +319,6 @@ class SongProvider extends ChangeNotifier {
   void toggleSongSelection(String path) {
     if (_selectedSongs.contains(path)) {
       _selectedSongs.remove(path);
-      // Auto-exit if no songs selected
       if (_selectedSongs.isEmpty) {
         _selectionMode = false;
       }
@@ -371,13 +338,10 @@ class SongProvider extends ChangeNotifier {
     int deletedCount = 0;
     final pathsToDelete = List<String>.from(_selectedSongs);
 
-    for (final path in pathsToDelete) {
-      final song = _songs.firstWhere(
-        (s) => s.path == path,
-        orElse: () => _allSongs.firstWhere((s) => s.path == path),
-      );
-      final success = await _audioHandler.deleteAudioFile(path);
-      if (success) {
+    final success = await _audioHandler.deleteAudioFiles(pathsToDelete);
+
+    if (success) {
+      for (final path in pathsToDelete) {
         _songs.removeWhere((s) => s.path == path);
         _allSongs.removeWhere((s) => s.path == path);
         _favorites.remove(path);

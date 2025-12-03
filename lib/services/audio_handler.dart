@@ -62,7 +62,6 @@ class AudioHandler {
         final path = songData['path'] as String? ?? '';
         if (path.isEmpty) continue;
 
-        // Eagerly extract art
         final artFile = await getArtCacheFile(path);
         String? artPath;
         if (await artFile.exists()) {
@@ -94,7 +93,6 @@ class AudioHandler {
         }
       }
 
-      // Final update
       if (onProgress != null) onProgress(count);
 
       return songs;
@@ -133,13 +131,24 @@ class AudioHandler {
 
   Future<bool> deleteAudioFile(String path) async {
     try {
-      final file = File(path);
-      if (await file.exists()) {
-        await file.delete();
-        return true;
-      }
+      final bool? success = await _channel.invokeMethod('deleteSong', {
+        'path': path,
+      });
+      return success ?? false;
     } catch (e) {
       print("❌ Error deleting file: $e");
+    }
+    return false;
+  }
+
+  Future<bool> deleteAudioFiles(List<String> paths) async {
+    try {
+      final bool? success = await _channel.invokeMethod('deleteSongs', {
+        'paths': paths,
+      });
+      return success ?? false;
+    } catch (e) {
+      print("❌ Error deleting files: $e");
     }
     return false;
   }

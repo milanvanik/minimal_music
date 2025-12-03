@@ -23,7 +23,6 @@ class PlaybackProvider extends ChangeNotifier {
       ? _playlist[currentIndex]
       : null;
 
-  // Check if audio is truly playing (not paused and not completed)
   bool get isActuallyPlaying {
     return player.playing &&
         player.processingState != ProcessingState.completed;
@@ -49,7 +48,6 @@ class PlaybackProvider extends ChangeNotifier {
       notifyListeners();
     });
     player.processingStateStream.listen((state) {
-      // When playlist completes, ensure UI updates
       if (state == ProcessingState.completed) {
         notifyListeners();
       }
@@ -70,11 +68,7 @@ class PlaybackProvider extends ChangeNotifier {
   }) async {
     if (songs.isEmpty) return;
 
-    // Check if we are already playing this song
     if (currentSong != null && currentSong!.path == songs[startIndex].path) {
-      // If the song is the same, just ensure we are playing and return.
-      // This prevents the song from restarting.
-      // Note: This keeps the OLD queue active. This is a trade-off for seamless playback.
       if (!player.playing && autoPlay) {
         player.play();
       }
@@ -113,7 +107,6 @@ class PlaybackProvider extends ChangeNotifier {
         await player.play();
       }
 
-      // Save playlist whenever it changes
       _savePlaylist(songs);
 
       notifyListeners();
@@ -133,7 +126,6 @@ class PlaybackProvider extends ChangeNotifier {
   Future<void> _loadLastState() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load playlist
     final List<String>? encoded = prefs.getStringList('last_playlist');
     if (encoded == null || encoded.isEmpty) return;
 
@@ -143,10 +135,8 @@ class PlaybackProvider extends ChangeNotifier {
           .toList();
       _playlist = songs;
 
-      // Load last index
       final int lastIndex = prefs.getInt('last_played_index') ?? 0;
 
-      // Setup player without auto-playing
       await setPlaylist(songs, lastIndex, autoPlay: false);
 
       notifyListeners();
@@ -156,7 +146,6 @@ class PlaybackProvider extends ChangeNotifier {
   }
 
   void play() async {
-    // If playlist completed, restart from the beginning
     if (player.processingState == ProcessingState.completed) {
       await player.seek(Duration.zero, index: 0);
     }
@@ -209,7 +198,6 @@ class PlaybackProvider extends ChangeNotifier {
 
   Uint8List? get currentAlbumArt => currentSong?.albumArt;
 
-  // Lyrics State
   bool _showLyrics = false;
   bool get showLyrics => _showLyrics;
 

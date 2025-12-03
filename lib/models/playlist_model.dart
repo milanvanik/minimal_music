@@ -13,7 +13,6 @@ class Playlist {
     required this.modifiedAt,
   });
 
-  // Create a copy with updated fields
   Playlist copyWith({
     String? id,
     String? name,
@@ -30,7 +29,6 @@ class Playlist {
     );
   }
 
-  // Serialize to JSON for storage
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
@@ -39,7 +37,6 @@ class Playlist {
     'modifiedAt': modifiedAt.millisecondsSinceEpoch,
   };
 
-  // Deserialize from JSON
   factory Playlist.fromJson(Map<String, dynamic> json) {
     return Playlist(
       id: json['id'] as String,

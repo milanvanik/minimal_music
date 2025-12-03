@@ -89,8 +89,6 @@ class SongSearchDelegate extends SearchDelegate {
                   albumArt: song.albumArt,
                   albumArtPath: song.albumArtPath,
                   onTap: () {
-                    // Find the index of this song in the main playlist
-                    // to keep the context of the full library
                     final originalIndex = songs.indexOf(song);
                     if (originalIndex != -1) {
                       FocusManager.instance.primaryFocus?.unfocus();

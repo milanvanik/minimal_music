@@ -36,14 +36,12 @@ class BulkActionBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
-            // Cancel button
             IconButton(
               icon: const Icon(Icons.close, color: Colors.white),
               onPressed: onCancel,
               tooltip: 'Cancel',
             ),
             const SizedBox(width: 8),
-            // Selection count
             Expanded(
               child: Text(
                 '$selectedCount selected',
@@ -56,13 +54,11 @@ class BulkActionBar extends StatelessWidget {
                 ),
               ),
             ),
-            // Select All button
             IconButton(
               onPressed: onSelectAll,
               icon: const Icon(Icons.select_all, color: Colors.white),
               tooltip: 'Select All',
             ),
-            // More Options Menu
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
               onSelected: (value) {

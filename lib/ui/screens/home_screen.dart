@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:music_player_app/ui/widgets/add_to_playlist_dialog.dart';
 import 'package:provider/provider.dart';
 import '../../providers/song_provider.dart';
 import '../../providers/playback_provider.dart';
 import '../widgets/song_list_tile.dart';
 import '../widgets/mini_player.dart';
 import '../widgets/search_delegate.dart';
-import '../widgets/add_to_playlist_dialog.dart';
 import '../widgets/bulk_action_bar.dart';
 import '../widgets/bulk_add_to_playlist_dialog.dart';
 import 'player_screen.dart';
@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen>
       curve: Curves.easeOut,
     );
 
-    // Initial load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _fadeController.forward();
     });
@@ -56,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Re-check permissions and load songs if granted
       Provider.of<SongProvider>(
         context,
         listen: false,
@@ -191,9 +189,8 @@ class _HomeScreenState extends State<HomeScreen>
                         style: TextStyle(color: Colors.white38, fontSize: 12),
                       ),
                       onTap: () async {
-                        Navigator.pop(context); // Close drawer
+                        Navigator.pop(context);
 
-                        // Show loading dialog
                         showDialog(
                           context: context,
                           barrierDismissible: false,
@@ -217,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen>
                         await songProvider.loadSongs(fromUser: true);
 
                         if (mounted) {
-                          Navigator.pop(context); // Close dialog
+                          Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
@@ -354,7 +351,10 @@ class _HomeScreenState extends State<HomeScreen>
             child: songs.isEmpty
                 ? Center(
                     child:
-                        (songProvider.isInitializing || songProvider.isScanning)
+                        (songProvider.isInitializing ||
+                                songProvider.isScanning) &&
+                            !(songProvider.showFavoritesOnly &&
+                                !songProvider.hasFavorites)
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -466,12 +466,10 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                   onTap: () {
                                     if (songProvider.selectionMode) {
-                                      // In selection mode, toggle selection
                                       songProvider.toggleSongSelection(
                                         song.path,
                                       );
                                     } else {
-                                      // Normal mode, play the song
                                       playbackProvider.setPlaylist(
                                         songs,
                                         index,
@@ -495,7 +493,6 @@ class _HomeScreenState extends State<HomeScreen>
                                           );
                                         },
                                   onLongPress: () {
-                                    // Enter selection mode on long press
                                     if (!songProvider.selectionMode) {
                                       songProvider.enterSelectionMode(
                                         song.path,
@@ -537,7 +534,6 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                             ),
                           ),
-                          // Thumb Indicator
                           AnimatedBuilder(
                             animation: _scrollController,
                             builder: (context, child) {
@@ -612,7 +608,6 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
             ),
-          // Bulk Action Bar for selection mode
           if (songProvider.selectionMode)
             Positioned(
               left: 0,
@@ -631,7 +626,6 @@ class _HomeScreenState extends State<HomeScreen>
                       builder: (context) =>
                           BulkAddToPlaylistDialog(songPaths: selectedPaths),
                     ).then((_) {
-                      // Exit selection mode after adding to playlist
                       songProvider.exitSelectionMode();
                     });
                   },
@@ -639,7 +633,7 @@ class _HomeScreenState extends State<HomeScreen>
                     final count = songProvider.selectedCount;
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
+                      builder: (dialogContext) => AlertDialog(
                         backgroundColor: Colors.grey[900],
                         title: const Text(
                           'Delete Songs',
@@ -651,12 +645,12 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () => Navigator.pop(dialogContext),
                             child: const Text('Cancel'),
                           ),
                           TextButton(
                             onPressed: () async {
-                              Navigator.pop(context);
+                              Navigator.pop(dialogContext);
                               final deletedCount = await songProvider
                                   .deleteSelectedSongs();
                               if (mounted) {

@@ -34,7 +34,6 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
-  // bool _showLyrics = false; // Removed local state
   bool _isDragging = false;
   double _dragValue = 0.0;
 
@@ -50,7 +49,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final playbackService = Provider.of<PlaybackProvider>(context);
     final currentSong = playbackService.currentSong;
     final audioPlayer = playbackService.player;
-    final showLyrics = playbackService.showLyrics; // Use provider state
+    final showLyrics = playbackService.showLyrics;
 
     if (currentSong == null) {
       return const Scaffold(

@@ -52,17 +52,15 @@ class _AddToPlaylistDialogState extends State<AddToPlaylistDialog> {
                 );
                 await playlistProvider.createPlaylist(controller.text.trim());
 
-                // Get the newly created playlist (it's the last one)
                 final newPlaylist = playlistProvider.playlists.last;
 
-                // Add the song to it
                 await playlistProvider.addSongToPlaylist(
                   newPlaylist.id,
                   widget.songPath,
                 );
 
                 if (mounted) {
-                  Navigator.pop(context); // Close create dialog
+                  Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Added to "${newPlaylist.name}"'),
@@ -95,7 +93,6 @@ class _AddToPlaylistDialogState extends State<AddToPlaylistDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar
           Container(
             margin: const EdgeInsets.symmetric(vertical: 12),
             width: 40,
@@ -105,7 +102,6 @@ class _AddToPlaylistDialogState extends State<AddToPlaylistDialog> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          // Title
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Text(
@@ -117,7 +113,6 @@ class _AddToPlaylistDialogState extends State<AddToPlaylistDialog> {
               ),
             ),
           ),
-          // Create New Playlist Button
           ListTile(
             leading: Container(
               width: 40,
@@ -140,7 +135,6 @@ class _AddToPlaylistDialogState extends State<AddToPlaylistDialog> {
             },
           ),
           const Divider(color: Colors.white10, height: 1),
-          // Playlists List
           if (playlists.isEmpty)
             const Padding(
               padding: EdgeInsets.all(40.0),

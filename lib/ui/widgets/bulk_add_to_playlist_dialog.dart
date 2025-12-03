@@ -53,10 +53,8 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
                 );
                 await playlistProvider.createPlaylist(controller.text.trim());
 
-                // Get the newly created playlist (it's the last one)
                 final newPlaylist = playlistProvider.playlists.last;
 
-                // Add all songs to it
                 for (final songPath in widget.songPaths) {
                   await playlistProvider.addSongToPlaylist(
                     newPlaylist.id,
@@ -65,8 +63,8 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
                 }
 
                 if (mounted) {
-                  Navigator.pop(context); // Close create dialog
-                  Navigator.pop(context); // Close bulk dialog
+                  Navigator.pop(context);
+                  Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -101,7 +99,6 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar
           Container(
             margin: const EdgeInsets.symmetric(vertical: 12),
             width: 40,
@@ -111,7 +108,6 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          // Title
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Text(
@@ -123,7 +119,6 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
               ),
             ),
           ),
-          // Create New Playlist Button
           ListTile(
             leading: Container(
               width: 40,
@@ -146,7 +141,6 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
             },
           ),
           const Divider(color: Colors.white10, height: 1),
-          // Playlists List
           if (playlists.isEmpty)
             const Padding(
               padding: EdgeInsets.all(40.0),
@@ -184,7 +178,6 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
                       style: const TextStyle(color: Colors.white),
                     ),
                     onTap: () async {
-                      // Add all songs to this playlist
                       for (final songPath in widget.songPaths) {
                         await playlistProvider.addSongToPlaylist(
                           playlist.id,
@@ -193,7 +186,7 @@ class _BulkAddToPlaylistDialogState extends State<BulkAddToPlaylistDialog> {
                       }
 
                       if (mounted) {
-                        Navigator.pop(context); // Close dialog
+                        Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(

@@ -13,7 +13,6 @@ class PlaylistProvider extends ChangeNotifier {
     _loadPlaylists();
   }
 
-  // Load playlists from SharedPreferences
   Future<void> _loadPlaylists() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -29,7 +28,6 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // Save playlists to SharedPreferences
   Future<void> _savePlaylists() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -40,7 +38,6 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // Get playlist by ID
   Playlist? getPlaylistById(String id) {
     try {
       return _playlists.firstWhere((p) => p.id == id);
@@ -49,7 +46,6 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // Create a new playlist
   Future<void> createPlaylist(String name) async {
     if (name.trim().isEmpty) return;
 
@@ -67,14 +63,12 @@ class PlaylistProvider extends ChangeNotifier {
     await _savePlaylists();
   }
 
-  // Delete a playlist
   Future<void> deletePlaylist(String id) async {
     _playlists.removeWhere((p) => p.id == id);
     notifyListeners();
     await _savePlaylists();
   }
 
-  // Rename a playlist
   Future<void> renamePlaylist(String id, String newName) async {
     if (newName.trim().isEmpty) return;
 
@@ -89,13 +83,11 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // Add a song to a playlist
   Future<void> addSongToPlaylist(String playlistId, String songPath) async {
     final index = _playlists.indexWhere((p) => p.id == playlistId);
     if (index != -1) {
       final playlist = _playlists[index];
 
-      // Don't add if already exists
       if (playlist.songPaths.contains(songPath)) return;
 
       final updatedSongPaths = List<String>.from(playlist.songPaths)
@@ -109,7 +101,6 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // Remove a song from a playlist
   Future<void> removeSongFromPlaylist(
     String playlistId,
     String songPath,
@@ -129,7 +120,6 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // Reorder songs in a playlist
   Future<void> reorderSongs(
     String playlistId,
     int oldIndex,
@@ -156,21 +146,17 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
-  // Check if a song is in a playlist
   bool isSongInPlaylist(String playlistId, String songPath) {
     final playlist = getPlaylistById(playlistId);
     return playlist?.songPaths.contains(songPath) ?? false;
   }
 
-  // Get songs in a playlist (resolved to Song objects)
   List<Song> getSongsInPlaylist(String playlistId, List<Song> allSongs) {
     final playlist = getPlaylistById(playlistId);
     if (playlist == null) return [];
 
-    // Create a map for quick lookup
     final songMap = {for (var song in allSongs) song.path: song};
 
-    // Resolve song paths to Song objects, filtering out missing songs
     return playlist.songPaths
         .map((path) => songMap[path])
         .whereType<Song>()
