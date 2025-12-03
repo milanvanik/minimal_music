@@ -150,7 +150,7 @@ class PlaylistsScreen extends StatelessWidget {
                     final playlist = playlists[index];
                     final songs = playlistProvider.getSongsInPlaylist(
                       playlist.id,
-                      songProvider.songs,
+                      songProvider.allSongs,
                     );
 
                     return Card(

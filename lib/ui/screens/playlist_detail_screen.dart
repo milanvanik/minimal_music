@@ -99,7 +99,7 @@ class PlaylistDetailScreen extends StatelessWidget {
 
     final songs = playlistProvider.getSongsInPlaylist(
       playlistId,
-      songProvider.songs,
+      songProvider.allSongs,
     );
 
     return Scaffold(

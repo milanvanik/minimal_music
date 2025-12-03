@@ -22,7 +22,7 @@ class BulkActionBar extends StatelessWidget {
       height: 72,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: Colors.blueGrey[900],
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

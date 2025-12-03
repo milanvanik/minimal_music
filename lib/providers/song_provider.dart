@@ -34,6 +34,10 @@ class SongProvider extends ChangeNotifier {
     return _songs;
   }
 
+  // Returns songs respecting folder/duration filters but IGNORING favorites filter
+  // Used for playlists to ensure they can show non-favorite songs even in Favorites mode
+  List<Song> get allSongs => _songs;
+
   bool get isInitializing => _isInitializing;
   SortOption get sortOption => _sortOption;
   bool get showFavoritesOnly => _showFavoritesOnly;
