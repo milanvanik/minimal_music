@@ -22,7 +22,7 @@ Here's a sneak peek at the clean and user-friendly interface of Minimal Music.
 
 ![App Screenshots Part 1](assets/screenshots/preview.png)
 
-![App Screenshots Part 2](assets/screenshots/preview_2.png)
+![App Screenshots Part 2](assets/screenshots/preview2.png)
 
 ## Tech Stack
 
