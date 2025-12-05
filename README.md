@@ -14,7 +14,7 @@ Minimal Music is designed to provide a seamless listening experience:
 • 🔍 **Smart Search**: Quickly find songs, artists, or albums with an efficient search bar.\
 • 🎧 **Background Playback**: Keep the music playing while using other apps or when the screen is off, with full notification controls.\
 • ⚙️ **Settings & Customization**: Manage app preferences and scan settings.\
-• 📊 **Clean Interface**: A distraction-free UI focused on your music.\
+• 📊 **Clean Interface**: A distraction-free UI focused on your music.
 
 ## Screenshots
 
