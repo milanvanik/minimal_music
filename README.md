@@ -8,13 +8,13 @@ This repository contains the complete source code for the Minimal Music applicat
 
 Minimal Music is designed to provide a seamless listening experience:
 
-• 🎵 **Local Playback**: Play audio files directly from your device storage with support for common formats.
-• 📂 **Folder Management**: Scan and organize music from specific folders on your device.
-• 🗂️ **Custom Playlists**: Create, manage, and organize your favorite tracks into playlists.
-• 🔍 **Smart Search**: Quickly find songs, artists, or albums with an efficient search bar.
-• 🎧 **Background Playback**: Keep the music playing while using other apps or when the screen is off, with full notification controls.
-• ⚙️ **Settings & Customization**: Manage app preferences and scan settings.
-• 📊 **Clean Interface**: A distraction-free UI focused on your music.
+• 🎵 **Local Playback**: Play audio files directly from your device storage with support for common formats.\
+• 📂 **Folder Management**: Scan and organize music from specific folders on your device.\
+• 🗂️ **Custom Playlists**: Create, manage, and organize your favorite tracks into playlists.\
+• 🔍 **Smart Search**: Quickly find songs, artists, or albums with an efficient search bar.\
+• 🎧 **Background Playback**: Keep the music playing while using other apps or when the screen is off, with full notification controls.\
+• ⚙️ **Settings & Customization**: Manage app preferences and scan settings.\
+• 📊 **Clean Interface**: A distraction-free UI focused on your music.\
 
 ## Screenshots
 
