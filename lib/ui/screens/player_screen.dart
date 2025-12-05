@@ -131,326 +131,311 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
           actions: [],
         ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Column(
-                      children: [
-                        const Spacer(),
-                        Hero(
-                          tag:
-                              "current-song-art-${playbackService.currentIndex}",
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 600),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                                  return AnimatedBuilder(
-                                    animation: animation,
+        body: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  children: [
+                    const Spacer(),
+                    Hero(
+                      tag: "current-song-art-${playbackService.currentIndex}",
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 600),
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                              return AnimatedBuilder(
+                                animation: animation,
+                                child: child,
+                                builder: (context, child) {
+                                  final isEntering =
+                                      (ValueKey(showLyrics) == child?.key);
+
+                                  if (animation.value < 0.5) {
+                                    return Visibility(
+                                      visible: false,
+                                      maintainSize: true,
+                                      maintainState: true,
+                                      maintainAnimation: true,
+                                      child: child!,
+                                    );
+                                  }
+
+                                  double angle;
+                                  if (isEntering) {
+                                    angle = (1.0 - animation.value) * 3.14159;
+                                  } else {
+                                    angle = (1.0 - animation.value) * -3.14159;
+                                  }
+
+                                  return Transform(
+                                    transform: Matrix4.identity()
+                                      ..setEntry(3, 2, 0.001)
+                                      ..rotateY(angle),
+                                    alignment: Alignment.center,
                                     child: child,
-                                    builder: (context, child) {
-                                      final isEntering =
-                                          (ValueKey(showLyrics) == child?.key);
-
-                                      if (animation.value < 0.5) {
-                                        return Visibility(
-                                          visible: false,
-                                          maintainSize: true,
-                                          maintainState: true,
-                                          maintainAnimation: true,
-                                          child: child!,
-                                        );
-                                      }
-
-                                      double angle;
-                                      if (isEntering) {
-                                        angle =
-                                            (1.0 - animation.value) * 3.14159;
-                                      } else {
-                                        angle =
-                                            (1.0 - animation.value) * -3.14159;
-                                      }
-
-                                      return Transform(
-                                        transform: Matrix4.identity()
-                                          ..setEntry(3, 2, 0.001)
-                                          ..rotateY(angle),
-                                        alignment: Alignment.center,
-                                        child: child,
-                                      );
-                                    },
                                   );
                                 },
-                            child: showLyrics
-                                ? _LyricsCard(
-                                    key: const ValueKey(true),
-                                    song: currentSong,
-                                    size:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                  )
-                                : SizedBox(
-                                    key: const ValueKey(false),
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    height:
-                                        MediaQuery.of(context).size.width * 0.9,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: artWidget,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        Text(
-                          currentSong.title,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          currentSong.artist,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 18,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                Icons.lyrics_rounded,
-                                color: showLyrics
-                                    ? Colors.deepPurpleAccent
-                                    : Colors.white70,
+                              );
+                            },
+                        child: showLyrics
+                            ? _LyricsCard(
+                                key: const ValueKey(true),
+                                song: currentSong,
+                                size: MediaQuery.of(context).size.width * 0.9,
+                              )
+                            : SizedBox(
+                                key: const ValueKey(false),
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                height: MediaQuery.of(context).size.width * 0.9,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: artWidget,
+                                ),
                               ),
-                              onPressed: () => playbackService.toggleLyrics(),
-                              tooltip: 'Lyrics',
-                            ),
-                            const SizedBox(width: 32),
-                            IconButton(
-                              icon: Icon(
-                                Provider.of<SongProvider>(
-                                      context,
-                                    ).isFavorite(currentSong.path)
-                                    ? Icons.favorite_rounded
-                                    : Icons.favorite_border_rounded,
-                                color:
-                                    Provider.of<SongProvider>(
-                                      context,
-                                    ).isFavorite(currentSong.path)
-                                    ? Colors.redAccent
-                                    : Colors.white70,
-                              ),
-                              onPressed: () {
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      currentSong.title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      currentSong.artist,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey[400], fontSize: 18),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.lyrics_rounded,
+                            color: showLyrics
+                                ? Colors.deepPurpleAccent
+                                : Colors.white70,
+                          ),
+                          onPressed: () => playbackService.toggleLyrics(),
+                          tooltip: 'Lyrics',
+                        ),
+                        const SizedBox(width: 32),
+                        IconButton(
+                          icon: Icon(
+                            Provider.of<SongProvider>(
+                                  context,
+                                ).isFavorite(currentSong.path)
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color:
                                 Provider.of<SongProvider>(
                                   context,
-                                  listen: false,
-                                ).toggleFavorite(currentSong.path);
+                                ).isFavorite(currentSong.path)
+                                ? Colors.redAccent
+                                : Colors.white70,
+                          ),
+                          onPressed: () {
+                            Provider.of<SongProvider>(
+                              context,
+                              listen: false,
+                            ).toggleFavorite(currentSong.path);
+                          },
+                          tooltip: 'Favorite',
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    StreamBuilder<Duration>(
+                      stream: audioPlayer.positionStream,
+                      builder: (context, snapshot) {
+                        final position = snapshot.data ?? Duration.zero;
+                        final duration = audioPlayer.duration ?? Duration.zero;
+                        return Column(
+                          children: [
+                            Slider(
+                              value: _isDragging
+                                  ? _dragValue
+                                  : position.inSeconds.toDouble().clamp(
+                                      0.0,
+                                      duration.inSeconds.toDouble(),
+                                    ),
+                              max: duration.inSeconds.toDouble(),
+                              onChangeStart: (value) {
+                                setState(() {
+                                  _isDragging = true;
+                                  _dragValue = value;
+                                });
                               },
-                              tooltip: 'Favorite',
+                              onChanged: (value) {
+                                setState(() {
+                                  _dragValue = value;
+                                });
+                              },
+                              onChangeEnd: (value) {
+                                audioPlayer.seek(
+                                  Duration(seconds: value.toInt()),
+                                );
+                                setState(() {
+                                  _isDragging = false;
+                                });
+                              },
+                              activeColor: Colors.deepPurpleAccent,
+                              inactiveColor: Colors.grey[700],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    _formatDuration(position),
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    _formatDuration(duration),
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
-                        ),
-                        const Spacer(),
-                        StreamBuilder<Duration>(
-                          stream: audioPlayer.positionStream,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        StreamBuilder<bool>(
+                          stream: audioPlayer.shuffleModeEnabledStream,
                           builder: (context, snapshot) {
-                            final position = snapshot.data ?? Duration.zero;
-                            final duration =
-                                audioPlayer.duration ?? Duration.zero;
-                            return Column(
-                              children: [
-                                Slider(
-                                  value: _isDragging
-                                      ? _dragValue
-                                      : position.inSeconds.toDouble().clamp(
-                                          0.0,
-                                          duration.inSeconds.toDouble(),
-                                        ),
-                                  max: duration.inSeconds.toDouble(),
-                                  onChangeStart: (value) {
-                                    setState(() {
-                                      _isDragging = true;
-                                      _dragValue = value;
-                                    });
-                                  },
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _dragValue = value;
-                                    });
-                                  },
-                                  onChangeEnd: (value) {
-                                    audioPlayer.seek(
-                                      Duration(seconds: value.toInt()),
-                                    );
-                                    setState(() {
-                                      _isDragging = false;
-                                    });
-                                  },
-                                  activeColor: Colors.deepPurpleAccent,
-                                  inactiveColor: Colors.grey[700],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        _formatDuration(position),
-                                        style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                      Text(
-                                        _formatDuration(duration),
-                                        style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                            final shuffleEnabled = snapshot.data ?? false;
+                            return IconButton(
+                              icon: Icon(
+                                Icons.shuffle_rounded,
+                                color: shuffleEnabled
+                                    ? Colors.deepPurpleAccent
+                                    : Colors.white70,
+                                size: 30,
+                              ),
+                              onPressed: playbackService.toggleShuffle,
                             );
                           },
                         ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            StreamBuilder<bool>(
-                              stream: audioPlayer.shuffleModeEnabledStream,
-                              builder: (context, snapshot) {
-                                final shuffleEnabled = snapshot.data ?? false;
-                                return IconButton(
-                                  icon: Icon(
-                                    Icons.shuffle_rounded,
-                                    color: shuffleEnabled
-                                        ? Colors.deepPurpleAccent
-                                        : Colors.white70,
-                                    size: 30,
-                                  ),
-                                  onPressed: playbackService.toggleShuffle,
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.skip_previous_rounded,
-                                color: Colors.white,
-                                size: 40,
-                              ),
-                              onPressed: playbackService.skipToPrevious,
-                            ),
-                            StreamBuilder<PlayerState>(
-                              stream: audioPlayer.playerStateStream,
-                              builder: (context, snapshot) {
-                                final playerState = snapshot.data;
-                                final processingState =
-                                    playerState?.processingState;
-                                final playing = playerState?.playing ?? false;
-
-                                if (processingState ==
-                                    ProcessingState.loading) {
-                                  return _buildControlButton(
-                                    child: const SizedBox(
-                                      width: 40,
-                                      height: 40,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 3,
-                                      ),
-                                    ),
-                                  );
-                                } else if (!playing) {
-                                  return _buildControlButton(
-                                    onPressed: playbackService.play,
-                                    child: const Icon(
-                                      Icons.play_arrow_rounded,
-                                      color: Colors.white,
-                                      size: 48,
-                                    ),
-                                  );
-                                } else if (processingState !=
-                                    ProcessingState.completed) {
-                                  return _buildControlButton(
-                                    onPressed: playbackService.pause,
-                                    child: const Icon(
-                                      Icons.pause_rounded,
-                                      color: Colors.white,
-                                      size: 48,
-                                    ),
-                                  );
-                                } else {
-                                  return _buildControlButton(
-                                    onPressed: playbackService.play,
-                                    child: const Icon(
-                                      Icons.replay_rounded,
-                                      color: Colors.white,
-                                      size: 48,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.skip_next_rounded,
-                                color: Colors.white,
-                                size: 40,
-                              ),
-                              onPressed: playbackService.skipToNext,
-                            ),
-                            StreamBuilder<LoopMode>(
-                              stream: audioPlayer.loopModeStream,
-                              builder: (context, snapshot) {
-                                final loopMode = snapshot.data ?? LoopMode.off;
-                                final icons = {
-                                  LoopMode.off: Icons.repeat_rounded,
-                                  LoopMode.all: Icons.repeat_rounded,
-                                  LoopMode.one: Icons.repeat_one_rounded,
-                                };
-                                final color = loopMode == LoopMode.off
-                                    ? Colors.white70
-                                    : Colors.deepPurpleAccent;
-
-                                return IconButton(
-                                  icon: Icon(
-                                    icons[loopMode],
-                                    color: color,
-                                    size: 30,
-                                  ),
-                                  onPressed: playbackService.toggleLoopMode,
-                                );
-                              },
-                            ),
-                          ],
+                        IconButton(
+                          icon: const Icon(
+                            Icons.skip_previous_rounded,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                          onPressed: playbackService.skipToPrevious,
                         ),
-                        const Spacer(),
+                        StreamBuilder<PlayerState>(
+                          stream: audioPlayer.playerStateStream,
+                          builder: (context, snapshot) {
+                            final playerState = snapshot.data;
+                            final processingState =
+                                playerState?.processingState;
+                            final playing = playerState?.playing ?? false;
+
+                            if (processingState == ProcessingState.loading) {
+                              return _buildControlButton(
+                                child: const SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                              );
+                            } else if (!playing) {
+                              return _buildControlButton(
+                                onPressed: playbackService.play,
+                                child: const Icon(
+                                  Icons.play_arrow_rounded,
+                                  color: Colors.white,
+                                  size: 48,
+                                ),
+                              );
+                            } else if (processingState !=
+                                ProcessingState.completed) {
+                              return _buildControlButton(
+                                onPressed: playbackService.pause,
+                                child: const Icon(
+                                  Icons.pause_rounded,
+                                  color: Colors.white,
+                                  size: 48,
+                                ),
+                              );
+                            } else {
+                              return _buildControlButton(
+                                onPressed: playbackService.play,
+                                child: const Icon(
+                                  Icons.replay_rounded,
+                                  color: Colors.white,
+                                  size: 48,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.skip_next_rounded,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                          onPressed: playbackService.skipToNext,
+                        ),
+                        StreamBuilder<LoopMode>(
+                          stream: audioPlayer.loopModeStream,
+                          builder: (context, snapshot) {
+                            final loopMode = snapshot.data ?? LoopMode.off;
+                            final icons = {
+                              LoopMode.off: Icons.repeat_rounded,
+                              LoopMode.all: Icons.repeat_rounded,
+                              LoopMode.one: Icons.repeat_one_rounded,
+                            };
+                            final color = loopMode == LoopMode.off
+                                ? Colors.white70
+                                : Colors.deepPurpleAccent;
+
+                            return IconButton(
+                              icon: Icon(
+                                icons[loopMode],
+                                color: color,
+                                size: 30,
+                              ),
+                              onPressed: playbackService.toggleLoopMode,
+                            );
+                          },
+                        ),
                       ],
                     ),
-                  ),
+                    const Spacer(),
+                  ],
                 ),
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
@@ -485,13 +470,14 @@ class _LyricsCard extends StatefulWidget {
 class _LyricsCardState extends State<_LyricsCard> {
   final AudioHandler _audioService = AudioHandler();
   String? _lyrics;
-  bool _isLoading = true;
   bool _isEditing = false;
   final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _lyrics = widget.song.lyrics;
+    _controller.text = _lyrics ?? '';
     _loadLyrics();
   }
 
@@ -507,11 +493,10 @@ class _LyricsCardState extends State<_LyricsCard> {
     final saved = await _audioService.getLyrics(widget.song.path);
     final initial = saved ?? widget.song.lyrics;
 
-    if (mounted) {
+    if (mounted && saved != null) {
       setState(() {
-        _lyrics = initial;
-        _controller.text = initial ?? '';
-        _isLoading = false;
+        _lyrics = saved;
+        _controller.text = saved;
       });
     }
   }
@@ -531,85 +516,85 @@ class _LyricsCardState extends State<_LyricsCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: widget.size,
-      height: widget.size,
-      decoration: BoxDecoration(
-        color: Colors.grey[850],
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Lyrics",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (!_isLoading)
-                IconButton(
-                  icon: Icon(
-                    _isEditing ? Icons.save_rounded : Icons.edit_rounded,
-                    color: Colors.deepPurpleAccent,
-                    size: 20,
+    return Material(
+      type: MaterialType.transparency,
+      child: Container(
+        width: widget.size,
+        height: widget.size,
+        decoration: BoxDecoration(
+          color: Colors.grey[850],
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Lyrics",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
-                  onPressed: () {
-                    if (_isEditing) {
-                      _saveLyrics();
-                    } else {
-                      setState(() => _isEditing = true);
-                    }
-                  },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
                 ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(
+                if (!_isEditing)
+                  IconButton(
+                    icon: Icon(
+                      _isEditing ? Icons.save_rounded : Icons.edit_rounded,
                       color: Colors.deepPurpleAccent,
+                      size: 20,
                     ),
-                  )
-                : _isEditing
-                ? TextField(
-                    controller: _controller,
-                    maxLines: null,
-                    expands: true,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    decoration: const InputDecoration(
-                      hintText: "Paste lyrics here...",
-                      hintStyle: TextStyle(color: Colors.white38),
-                      border: InputBorder.none,
-                    ),
-                  )
-                : SingleChildScrollView(
-                    child: Text(
-                      _lyrics ?? "No lyrics available.\nTap edit to add them.",
-                      style: TextStyle(
-                        color: _lyrics == null ? Colors.white38 : Colors.white,
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    onPressed: () {
+                      if (_isEditing) {
+                        _saveLyrics();
+                      } else {
+                        setState(() => _isEditing = true);
+                      }
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
-          ),
-        ],
+              ],
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: _isEditing
+                  ? TextField(
+                      controller: _controller,
+                      maxLines: null,
+                      expands: true,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      decoration: const InputDecoration(
+                        hintText: "Paste lyrics here...",
+                        hintStyle: TextStyle(color: Colors.white38),
+                        border: InputBorder.none,
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: Text(
+                        _lyrics ??
+                            "No lyrics available.\nTap edit to add them.",
+                        style: TextStyle(
+                          color: _lyrics == null
+                              ? Colors.white38
+                              : Colors.white,
+                          fontSize: 14,
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
