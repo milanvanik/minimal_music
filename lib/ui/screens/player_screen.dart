@@ -197,9 +197,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    Text(
+                    _MarqueeText(
                       currentSong.title,
-                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).textTheme.bodyLarge?.color,
                         fontSize: 22,
@@ -207,9 +206,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    _MarqueeText(
                       currentSong.artist,
-                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).textTheme.bodySmall?.color,
                         fontSize: 18,
@@ -223,7 +221,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           icon: Icon(
                             Icons.lyrics_rounded,
                             color: showLyrics
-                                ? Colors.deepPurpleAccent
+                                ? Colors.redAccent
                                 : Theme.of(context).iconTheme.color,
                           ),
                           onPressed: () => playbackService.toggleLyrics(),
@@ -267,7 +265,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         ),
                       ],
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 16),
                     StreamBuilder<Duration>(
                       stream: audioPlayer.positionStream,
                       builder: (context, snapshot) {
@@ -357,7 +355,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 Icons.shuffle_rounded,
                                 color: shuffleEnabled
                                     ? Colors.deepPurpleAccent
-                                    : Theme.of(context).iconTheme.color,
+                                    : _getControlIconColor(context),
                                 size: 30,
                               ),
                               onPressed: playbackService.toggleShuffle,
@@ -367,7 +365,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         IconButton(
                           icon: Icon(
                             Icons.skip_previous_rounded,
-                            color: Theme.of(context).iconTheme.color,
+                            color: _getControlIconColor(context),
                             size: 40,
                           ),
                           onPressed: playbackService.skipToPrevious,
@@ -386,7 +384,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   width: 40,
                                   height: 40,
                                   child: CircularProgressIndicator(
-                                    color: Theme.of(context).iconTheme.color,
+                                    color: _getPlayButtonIconColor(context),
                                     strokeWidth: 3,
                                   ),
                                 ),
@@ -396,7 +394,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 onPressed: playbackService.play,
                                 child: Icon(
                                   Icons.play_arrow_rounded,
-                                  color: Theme.of(context).iconTheme.color,
+                                  color: _getPlayButtonIconColor(context),
                                   size: 48,
                                 ),
                               );
@@ -406,7 +404,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 onPressed: playbackService.pause,
                                 child: Icon(
                                   Icons.pause_rounded,
-                                  color: Theme.of(context).iconTheme.color,
+                                  color: _getPlayButtonIconColor(context),
                                   size: 48,
                                 ),
                               );
@@ -415,7 +413,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 onPressed: playbackService.play,
                                 child: Icon(
                                   Icons.replay_rounded,
-                                  color: Theme.of(context).iconTheme.color,
+                                  color: _getPlayButtonIconColor(context),
                                   size: 48,
                                 ),
                               );
@@ -425,7 +423,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         IconButton(
                           icon: Icon(
                             Icons.skip_next_rounded,
-                            color: Theme.of(context).iconTheme.color,
+                            color: _getControlIconColor(context),
                             size: 40,
                           ),
                           onPressed: playbackService.skipToNext,
@@ -440,7 +438,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               LoopMode.one: Icons.repeat_one_rounded,
                             };
                             final color = loopMode == LoopMode.off
-                                ? Theme.of(context).iconTheme.color
+                                ? _getControlIconColor(context)
                                 : Colors.deepPurpleAccent;
 
                             return IconButton(
@@ -464,6 +462,20 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ),
       ),
     );
+  }
+
+  Color _getPlayButtonIconColor(BuildContext context) {
+    // Use background color for play/pause button in both themes
+    // This creates strong contrast on the purple circle
+    return Theme.of(context).scaffoldBackgroundColor;
+  }
+
+  Color _getControlIconColor(BuildContext context) {
+    // Use artist name color (bodySmall) in light theme for better contrast
+    // Keep icon theme color (white) in dark theme
+    return Theme.of(context).brightness == Brightness.light
+        ? Theme.of(context).textTheme.bodySmall?.color ?? Colors.black54
+        : Theme.of(context).iconTheme.color ?? Colors.white;
   }
 
   Widget _buildControlButton({Widget? child, VoidCallback? onPressed}) {
@@ -629,6 +641,70 @@ class _LyricsCardState extends State<_LyricsCard> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _MarqueeText extends StatefulWidget {
+  final String text;
+  final TextStyle? style;
+
+  const _MarqueeText(this.text, {Key? key, this.style}) : super(key: key);
+
+  @override
+  State<_MarqueeText> createState() => _MarqueeTextState();
+}
+
+class _MarqueeTextState extends State<_MarqueeText> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startScrolling());
+  }
+
+  void _startScrolling() async {
+    while (mounted) {
+      if (_scrollController.hasClients &&
+          _scrollController.position.maxScrollExtent > 0) {
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) break;
+        await _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(
+            seconds:
+                (_scrollController.position.maxScrollExtent / 30).round() + 5,
+          ),
+          curve: Curves.linear,
+        );
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) break;
+        await _scrollController.animateTo(
+          0.0,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeOut,
+        );
+      } else {
+        await Future.delayed(const Duration(seconds: 1));
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      controller: _scrollController,
+      scrollDirection: Axis.horizontal,
+      physics: const NeverScrollableScrollPhysics(),
+      child: Text(widget.text, style: widget.style, maxLines: 1),
     );
   }
 }

@@ -113,7 +113,7 @@ class MiniPlayer extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                     ),
@@ -123,10 +123,7 @@ class MiniPlayer extends StatelessWidget {
                     artist,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.grey[400], fontSize: 13),
                   ),
                 ],
               ),
@@ -145,14 +142,14 @@ class MiniPlayer extends StatelessWidget {
                     height: 28,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Theme.of(context).iconTheme.color,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
                   );
                 } else if (isPlayingLive &&
                     processing != ProcessingState.completed) {
                   icon = Icon(
                     Icons.pause_rounded,
-                    color: Theme.of(context).iconTheme.color,
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                     size: 32,
                   );
                 } else {
@@ -160,7 +157,7 @@ class MiniPlayer extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 10),
                     child: Icon(
                       Icons.play_arrow_rounded,
-                      color: Theme.of(context).iconTheme.color,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                       size: 32,
                     ),
                   );
@@ -172,7 +169,7 @@ class MiniPlayer extends StatelessWidget {
                     IconButton(
                       icon: Icon(
                         Icons.skip_next_rounded,
-                        color: Theme.of(context).iconTheme.color,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
                         size: 30,
                       ),
                       onPressed: onNext,
