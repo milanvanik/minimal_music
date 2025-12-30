@@ -17,9 +17,6 @@
     <a href="LICENSE">
       <img src="https://img.shields.io/github/license/milanrnw/minimal_music?style=for-the-badge" alt="License" />
     </a>
-    <a href="https://github.com/milanrnw/minimal_music/stargazers">
-      <img src="https://img.shields.io/github/stars/milanrnw/minimal_music?style=for-the-badge" alt="Stars" />
-    </a>
   </p>
 </div>
 
