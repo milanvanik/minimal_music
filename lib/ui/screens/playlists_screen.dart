@@ -196,14 +196,16 @@ class PlaylistsScreen extends StatelessWidget {
                         title: Text(
                           playlist.name,
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                         subtitle: Text(
                           '${songs.length} ${songs.length == 1 ? 'song' : 'songs'}',
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
+                            color: Colors.grey[400],
+                            fontSize: 14,
                           ),
                         ),
                         trailing: Icon(
@@ -238,7 +240,14 @@ class PlaylistsScreen extends StatelessWidget {
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.color,
+                                    ),
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () {

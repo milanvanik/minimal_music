@@ -128,6 +128,34 @@ class PlaylistProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> insertSongToPlaylist(
+    String playlistId,
+    String songPath,
+    int insertIndex,
+  ) async {
+    final index = _playlists.indexWhere((p) => p.id == playlistId);
+    if (index != -1) {
+      final playlist = _playlists[index];
+
+      if (playlist.songPaths.contains(songPath)) return;
+
+      final updatedSongPaths = List<String>.from(playlist.songPaths);
+      if (insertIndex < 0) {
+        insertIndex = 0;
+      } else if (insertIndex > updatedSongPaths.length) {
+        insertIndex = updatedSongPaths.length;
+      }
+
+      updatedSongPaths.insert(insertIndex, songPath);
+      _playlists[index] = playlist.copyWith(
+        songPaths: updatedSongPaths,
+        modifiedAt: DateTime.now(),
+      );
+      notifyListeners();
+      await _savePlaylists();
+    }
+  }
+
   Future<void> removeSongFromPlaylist(
     String playlistId,
     String songPath,

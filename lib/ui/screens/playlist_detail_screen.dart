@@ -123,7 +123,7 @@ class PlaylistDetailScreen extends StatelessWidget {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  backgroundColor: Colors.grey[900],
+                  backgroundColor: Theme.of(context).cardColor,
                   title: const Text('Delete Playlist', style: TextStyle()),
                   content: Text(
                     'Are you sure you want to delete "${playlist.name}"?',
@@ -134,7 +134,12 @@ class PlaylistDetailScreen extends StatelessWidget {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
+                      ),
                     ),
                     TextButton(
                       onPressed: () async {
@@ -147,7 +152,7 @@ class PlaylistDetailScreen extends StatelessWidget {
                           // Close the screen
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            const SnackBar(
                               content: Text('Playlist deleted'),
                               backgroundColor: Colors.redAccent,
                             ),
@@ -255,18 +260,35 @@ class PlaylistDetailScreen extends StatelessWidget {
                               ),
                             ),
                             onDismissed: (direction) {
+                              final removedSongPath = song.path;
+                              final removedIndex = index;
+
                               playlistProvider.removeSongFromPlaylist(
                                 playlistId,
-                                song.path,
+                                removedSongPath,
                               );
-                              playbackProvider.removeSongFromQueue(song.path);
+                              playbackProvider.removeSongFromQueue(
+                                removedSongPath,
+                              );
+
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
                                     'Removed "${song.title}"',
-                                    style: TextStyle(),
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                   backgroundColor: Colors.deepPurpleAccent,
+                                  action: SnackBarAction(
+                                    label: 'Undo',
+                                    textColor: Colors.white,
+                                    onPressed: () {
+                                      playlistProvider.insertSongToPlaylist(
+                                        playlistId,
+                                        removedSongPath,
+                                        removedIndex,
+                                      );
+                                    },
+                                  ),
                                 ),
                               );
                             },
@@ -326,13 +348,19 @@ class PlaylistDetailScreen extends StatelessWidget {
                                             Navigator.pop(
                                               context,
                                             ); // Close sheet
+
+                                            final removedSongPath = song.path;
+                                            final removedIndex = index;
+
                                             playlistProvider
                                                 .removeSongFromPlaylist(
                                                   playlistId,
-                                                  song.path,
+                                                  removedSongPath,
                                                 );
                                             playbackProvider
-                                                .removeSongFromQueue(song.path);
+                                                .removeSongFromQueue(
+                                                  removedSongPath,
+                                                );
                                             ScaffoldMessenger.of(
                                               context,
                                             ).showSnackBar(
@@ -340,13 +368,23 @@ class PlaylistDetailScreen extends StatelessWidget {
                                                 content: Text(
                                                   'Removed "${song.title}"',
                                                   style: TextStyle(
-                                                    color: Theme.of(
-                                                      context,
-                                                    ).iconTheme.color,
+                                                    color: Colors.white,
                                                   ),
                                                 ),
                                                 backgroundColor:
                                                     Colors.deepPurpleAccent,
+                                                action: SnackBarAction(
+                                                  label: 'Undo',
+                                                  textColor: Colors.white,
+                                                  onPressed: () {
+                                                    playlistProvider
+                                                        .insertSongToPlaylist(
+                                                          playlistId,
+                                                          removedSongPath,
+                                                          removedIndex,
+                                                        );
+                                                  },
+                                                ),
                                               ),
                                             );
                                           },
