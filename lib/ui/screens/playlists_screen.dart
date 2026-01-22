@@ -189,7 +189,7 @@ class PlaylistsScreen extends StatelessWidget {
                           ),
                           child: Icon(
                             Icons.playlist_play_rounded,
-                            color: Theme.of(context).iconTheme.color,
+                            color: Colors.white,
                             size: 28,
                           ),
                         ),
